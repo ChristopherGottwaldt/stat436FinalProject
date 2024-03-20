@@ -1,0 +1,95 @@
+---
+title: "milestone_2"
+author: "Maxwell Sonnenburg"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(readxl)
+library(ggplot2)
+library(shiny)
+library(dplyr)
+library(readr)
+library(knitr)
+library(tidyr)
+```
+
+```{r}
+births = read_xlsx("p01161-22-tb.xlsx", sheet = 2, skip = 1)
+
+births = births %>% na.omit()
+
+# Rename the columns before pivoting
+births = rename(births, Female = `Number of Female Births`, Male = `Number of Male Births`)
+
+# Pivot longer
+births_long = pivot_longer(births, 
+                            cols = c(Male, Female), 
+                            names_to = "Gender", 
+                            values_to = "Births")
+
+# Remove "Total" column
+births = births[-1,]
+```
+
+# Interactive Plot of Male and Female Births by County
+```{r}
+ui = fluidPage(
+    selectInput("gender", "Gender", choices = c("Male", "Female"), selected = c("Male", "Female"), multiple = TRUE),
+    selectInput("county","County", choices = unique(births$County), selected = unique(births$County), multiple = TRUE),
+  mainPanel(
+    plotOutput("birth_counts")
+  )
+)
+
+server <- function(input, output) {
+  
+  output$birth_counts <- renderPlot({
+    # Filter births_long based on selected counties
+    filtered_births_long <- births_long %>%
+      filter(County %in% input$county)
+    
+    # Filter births based on selected counties
+    filtered_births <- births %>%
+      filter(County %in% input$county)
+    
+    if ("Male" %in% input$gender && "Female" %in% input$gender) {
+      print("Displaying combined plot")
+      combined <- ggplot(filtered_births_long) +
+        geom_col(aes(x = County, y = Births, fill = Gender), position = "dodge") +
+        scale_fill_manual(values = c("Male" = "lightblue", "Female" = "lightpink")) +
+        theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+        labs(fill = "Gender")
+      return(combined)
+    } else if ("Male" %in% input$gender) {
+      print("Displaying males plot")
+      males <- ggplot(filtered_births) +
+        geom_col(aes(x = County, y = Male), fill = "lightblue") +
+        theme(axis.text.x = element_text(angle = 45, hjust = 1))
+      return(males)
+    } else if ("Female" %in% input$gender) {
+      print("Displaying females plot")
+      females <- ggplot(filtered_births) +
+        geom_col(aes(x = County, y = Female), fill = "lightpink") +
+        theme(axis.text.x = element_text(angle = 45, hjust = 1))
+      return(females)
+    } else {
+      # If neither Male nor Female is selected, display an empty plot
+      print("No gender selected, displaying empty plot")
+      return(plot(NULL, xlim = c(0, 1), ylim = c(0, 1), xlab = "", ylab = "", main = ""))
+    }
+  })
+}
+
+shinyApp(ui, server)
+```
+
+
+
+
+
+
+
