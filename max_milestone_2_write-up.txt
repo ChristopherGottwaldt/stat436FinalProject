@@ -1,0 +1,16 @@
+1. Choice of design prototypes. Which visualization approaches did your team decide to
+implement, and why did you choose the ones that you did?
+
+We created a bar plot of the number of births by each county for both males and females. We did this because we felt that it was important to get an idea of the number of births to know what scale we are dealing with. Reshaping the data was necessary to get the combined plot. For it we had to pivot longer for the UI to register that when both "Male" and "Female" were selected. 
+
+2. Demonstration and implementation discussion. For static visualizations, directly include
+your prototype figure. For interactive views, link to either a web-hosted prototype or a
+video recording. Explain the logic of your implementation.
+
+First we take the user input which selects "Male", "Female" or both. Then it goes through some if-else statements and depending on which one(s) evaluates a plot is outputted for that selection. In addition, users can select which counties to display because it is very busy if all are present.  
+
+3. Critical evaluation. Now that you see the designs on your real data, what trade-offs do you think there are alternative designs? How do you plan to proceed in the final
+interface or review?
+
+If this was made into a static visualization with "Patchwork" it would be very small and hard to 
+see the plots next to each other. However the "Patchwork" route would be better in terms of comparability between plots since it is easier to compare information side-by-side rather than waiting for the interactive visualizations to render. A bar plot makes the most sense over a scatter plot or a line plot since the x-axis is categorical. Perhaps if the bars were plotted horizontally it would be easier to read the names of the counties, but plotting it vertically works as well. 
