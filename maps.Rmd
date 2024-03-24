@@ -1,0 +1,86 @@
+---
+title: "maps"
+author: "Yalei Zhao"
+date: "2024-03-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(sf)
+library(shiny)
+# library(leaflet) # I failed using leafet
+```
+
+
+# geometry data
+```{r}
+wi_counties <- st_read("County_Boundaries_24K.geojson")
+
+wi_counties <- wi_counties %>% 
+  arrange(COUNTY_NAME)
+```
+
+
+# birth dataset has 72 counties, wi_conties has 71, do not have "Saint Croix", will merge dataset using the 71 counties.
+```{r}
+birth <- read.csv("2022birthdataWiscIteration2.csv")
+birth<- birth[-1, ]  #remove header
+# birth$county
+
+# Perform an inner join based on the COUNTY_NAME and county columns
+merged_data <- merge(birth, wi_counties, by.x = "county", by.y = "COUNTY_NAME")
+
+# # convert to sf
+merged_data <- st_as_sf(merged_data)
+
+# View the first few rows of the merged dataset
+# head(merged_data)
+```
+
+
+
+# the maps [currenly do no not have county names on the map]
+```{r}
+# Define UI for application
+ui <- fluidPage(
+  titlePanel("County Births Map"),
+  radioButtons("variable", "Select Variable to Display:",
+               choices = c("Total Births" = "total_births",
+                           "Female Births" = "f_births",
+                           "Male Births" = "m_births",
+                           "Crude Birth Rate" = "crude_birth_rate",
+                           "Fertility Rate" = "fertility_rate"),     # can add more choices...
+               selected = "total_births"),  # Default selection
+  plotOutput("map")
+)
+
+# Define server logic
+server <- function(input, output) {
+
+  # Create map
+  output$map <- renderPlot({
+    # Extract selected variable
+    variable <- input$variable
+    
+    ggplot() +
+      geom_sf(data = merged_data, aes(fill = !!as.name(variable))) +  # Dynamically map selected variable to fill aesthetic
+      scale_fill_gradient(low = "lightblue", high = "darkblue") +
+      labs(title = paste("Map of Wisconsin by", variable)) +
+      theme_minimal() +
+      theme(legend.position = "bottom")
+  })
+}
+
+# Run the application 
+shinyApp(ui = ui, server = server)
+
+```
+
+
+
