@@ -1,0 +1,98 @@
+---
+title: "Ethnicity Distribution"
+Author: "Keval Patel"
+date: "`r Sys.Date()`"
+---
+
+
+```{r}
+library(ggplot2)
+library(shiny)
+library(dplyr)
+library(tidyr)
+library(readr)
+
+births = read_csv('2022birthdataWiscIteration2.csv')
+births <- births %>%
+  mutate(across(-county, ~ifelse(. == "<5", "0", as.character(.)))) %>%
+  mutate(across(-county, as.numeric))
+
+```
+
+```{r}
+births = read_csv('2022birthdataWiscIteration2.csv')
+births <- births %>%
+  mutate(across(-county, ~ifelse(. == "<5", "0", as.character(.)))) %>%
+  mutate(across(-county, as.numeric))
+```
+
+```{r}
+ui <- fluidPage(
+  titlePanel("Births by Mother's Ethnicity"),
+  sidebarLayout(
+    sidebarPanel(
+      selectInput("selectedCounty", "Select a County:", choices = births$county),
+      selectInput("selectedEthnicity", "Select an Ethnicity:",
+                  choices = colnames(births)[grepl("^mother_ethnicity_", colnames(births))])
+    ),
+    mainPanel(
+      plotOutput("ethnicityPlot"),
+      plotOutput("ethnicityComparisonPlot") # Add this line for the new plot
+    )
+  )
+)
+
+
+server <- function(input, output) {
+  output$ethnicityPlot <- renderPlot({
+    
+    filtered_data <- filter(births, county == input$selectedCounty)
+    
+   
+    long_data <- pivot_longer(filtered_data, 
+                              cols = starts_with("mother_ethnicity"), 
+                              names_to = "Ethnicity", 
+                              values_to = "Births")
+    
+    
+    long_data$Ethnicity <- sub("mother_ethnicity_", "", long_data$Ethnicity)
+    
+    
+    ggplot(long_data, aes(x = Ethnicity, y = Births, fill = Ethnicity)) +
+      geom_bar(stat = "identity") +
+      theme_minimal() +
+      labs(title = paste("Distribution of Births by Ethnicity in", input$selectedCounty),
+           x = "Ethnicity", y = "Number of Births") +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+  })
+  output$ethnicityComparisonPlot <- renderPlot({
+      ethnicity_col <- input$selectedEthnicity 
+      
+      
+      comparison_data <- births %>%
+        group_by(county) %>%
+        summarize(Total_Births = sum(.data[[ethnicity_col]], na.rm = TRUE))
+      
+      
+      ggplot(comparison_data, aes(x = reorder(county, Total_Births), y = Total_Births, size = Total_Births, color = county)) +
+        geom_point(alpha = 0.5) +
+        scale_size(range = c(3, 20), name = "Total Births") +
+        theme_minimal() +
+        labs(title = paste("Total Births for", gsub("mother_ethnicity_", "", ethnicity_col), "Across Counties"),
+             x = "County", y = "Number of Births") +
+        theme(axis.text.x = element_text(angle = 90, hjust = 1), legend.position = "none") 
+  })
+  
+
+}
+
+
+
+shinyApp(ui, server )
+
+```
+
+
+
+
+
