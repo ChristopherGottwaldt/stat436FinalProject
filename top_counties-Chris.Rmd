@@ -1,0 +1,62 @@
+---
+title: "Top Counties"
+author: "Chris Gottwaldt"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(readxl)
+library(ggplot2)
+library(shiny)
+library(dplyr)
+library(readr)
+library(knitr)
+library(tidyr)
+```
+
+```{r}
+births = read_csv("2022birthdataWiscIteration2.csv")
+
+# head(births)
+# colnames(births)
+```
+
+```{r}
+# table for top 5 highest total birth counties
+top_births = births %>%
+  arrange(desc(total_births)) %>%
+  reframe(
+    "County" = county,
+    "Total Births" = total_births,
+    "Female Babies" = f_births,
+    "Male Babies" = m_births,
+    "Crude Birth Rate" = crude_birth_rate
+  )
+
+head(top_births, 10)
+```
+
+```{r}
+# table for top 5 highest fertility rate counties
+top_fertility = births %>%
+  arrange(desc(fertility_rate)) %>%
+  reframe(
+    "County" = county,
+    "Fertility Rate" = fertility_rate,
+    "Total Births" = total_births,
+    "Female Babies" = f_births,
+    "Male Babies" = m_births
+  )
+
+head(top_fertility, 10)
+```
+
+
+
+
+
+
+
