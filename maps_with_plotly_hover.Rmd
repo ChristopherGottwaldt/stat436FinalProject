@@ -15,13 +15,12 @@ library(dplyr)
 library(sf)
 library(shiny)
 library(plotly)
-# library(leaflet) # I failed using leafet
 ```
 
 
 # geometry data
 ```{r}
-wi_counties <- st_read("County_Boundaries_24K.geojson")
+wi_counties <- st_read("https://uwmadison.box.com/shared/static/iezuh9n53402jfz10vldy58r1rcihmym.geojson")
 
 wi_counties <- wi_counties %>% 
   arrange(COUNTY_NAME)
@@ -30,7 +29,7 @@ wi_counties <- wi_counties %>%
 
 # birth dataset has 72 counties, wi_conties has 71, do not have "Saint Croix", will merge dataset using the 71 counties.
 ```{r}
-birth <- read.csv("2022birthdataWiscIteration2.csv")
+birth <- read.csv("https://uwmadison.box.com/shared/static/b0k2jqpexlbtx23onrb5v8cumybcj9jk.csv")
 birth<- birth[-1, ]  #remove header
 # birth$county
 
