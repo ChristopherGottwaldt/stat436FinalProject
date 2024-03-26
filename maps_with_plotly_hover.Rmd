@@ -47,7 +47,7 @@ merged_data <- st_as_sf(merged_data)
 
 # the maps [currenly do no not have county names on the map]
 ```{r}
-# Define UI for application
+# UI
 ui <- fluidPage(
   titlePanel("County Births Map"),
   radioButtons("variable", "Select Variable to Display:",
@@ -60,20 +60,29 @@ ui <- fluidPage(
   plotlyOutput("map")
 )
 
-# Define server logic
+# Server
 server <- function(input, output) {
-
+  
   # Create map
   output$map <- renderPlotly({
     # Extract selected variable
     variable <- input$variable
     
+    # Create tooltip text with county names and variable values
+    tooltip_text <- paste(
+      "County: ", merged_data$county, "<br>",
+      variable, ": ", format(merged_data[[variable]], nsmall = 2)
+    )
+    
+    # Plot map
     ggplot() +
-      geom_sf(data = merged_data, aes(fill = !!as.name(variable))) +  # Dynamically map selected variable to fill aesthetic
+      geom_sf(data = merged_data, aes(fill = !!as.name(variable), text = tooltip_text)) +  # Modify tooltip
       scale_fill_gradient(low = "lightblue", high = "darkblue") +
-      labs(title = paste("Map of Wisconsin by", variable)) +
+      ggtitle(paste("Map of Wisconsin by", variable)) +
       theme_minimal() +
-      theme(legend.position = "bottom")
+      theme(legend.position = "bottom") -> p
+    
+    ggplotly(p, tooltip = "text")  # Ensure tooltip displays custom text
   })
 }
 
