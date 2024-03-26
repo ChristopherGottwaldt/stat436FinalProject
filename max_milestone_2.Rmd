@@ -18,12 +18,13 @@ library(tidyr)
 ```
 
 ```{r}
-births = read_xlsx("p01161-22-tb.xlsx", sheet = 2, skip = 1)
+#births = read_xlsx("p01161-22-tb.xlsx", sheet = 2, skip = 1)
+births = read.csv("https://raw.githubusercontent.com/ChristopherGottwaldt/stat436FinalProject/main/2022birthdataWiscIteration2.csv?token=GHSAT0AAAAAACNUA6QGL7HZNETXTQSCY7O6ZQCFZYA")
 
 births = births %>% na.omit()
 
 # Rename the columns before pivoting
-births = rename(births, Female = `Number of Female Births`, Male = `Number of Male Births`)
+births = rename(births, Female = `f_births`, Male = `m_births`)
 
 # Pivot longer
 births_long = pivot_longer(births, 
@@ -39,7 +40,7 @@ births = births[-1,]
 ```{r}
 ui = fluidPage(
     selectInput("gender", "Gender", choices = c("Male", "Female"), selected = c("Male", "Female"), multiple = TRUE),
-    selectInput("county","County", choices = unique(births$County), selected = unique(births$County), multiple = TRUE),
+    selectInput("county","County", choices = unique(births$county), selected = unique(births$county), multiple = TRUE),
   mainPanel(
     plotOutput("birth_counts")
   )
@@ -50,16 +51,16 @@ server <- function(input, output) {
   output$birth_counts <- renderPlot({
     # Filter births_long based on selected counties
     filtered_births_long <- births_long %>%
-      filter(County %in% input$county)
+      filter(county %in% input$county)
     
     # Filter births based on selected counties
     filtered_births <- births %>%
-      filter(County %in% input$county)
+      filter(county %in% input$county)
     
     if ("Male" %in% input$gender && "Female" %in% input$gender) {
       print("Displaying combined plot")
       combined <- ggplot(filtered_births_long) +
-        geom_col(aes(x = County, y = Births, fill = Gender), position = "dodge") +
+        geom_col(aes(x = county, y = Births, fill = Gender), position = "dodge") +
         scale_fill_manual(values = c("Male" = "lightblue", "Female" = "lightpink")) +
         theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
         labs(fill = "Gender")
@@ -67,13 +68,13 @@ server <- function(input, output) {
     } else if ("Male" %in% input$gender) {
       print("Displaying males plot")
       males <- ggplot(filtered_births) +
-        geom_col(aes(x = County, y = Male), fill = "lightblue") +
+        geom_col(aes(x = county, y = Male), fill = "lightblue") +
         theme(axis.text.x = element_text(angle = 45, hjust = 1))
       return(males)
     } else if ("Female" %in% input$gender) {
       print("Displaying females plot")
       females <- ggplot(filtered_births) +
-        geom_col(aes(x = County, y = Female), fill = "lightpink") +
+        geom_col(aes(x = county, y = Female), fill = "lightpink") +
         theme(axis.text.x = element_text(angle = 45, hjust = 1))
       return(females)
     } else {
