@@ -25,7 +25,12 @@ ui <- fluidPage(
                            "Female Births" = "f_births",
                            "Male Births" = "m_births",
                            "Crude Birth Rate" = "crude_birth_rate",
-                           "Fertility Rate" = "fertility_rate"),     # can add more choices...
+                           "Fertility Rate" = "fertility_rate",
+                           "women_18+_<HS_diploma" ="women_18._.HS_diploma",
+                           "women_18+_HS_diploma/GED"="women_18._HS_diploma.GED",
+                           "women_18+_some_college_associates"="women_18._some_college_associates",
+                           "women_18+_bachelors+"="women_18._bachelors."
+                           ), 
                selected = "total_births"),  # Default selection
   plotlyOutput("map")
 )
