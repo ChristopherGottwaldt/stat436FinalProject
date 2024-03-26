@@ -15,7 +15,7 @@ library(kableExtra)
 ```
 
 ```{r, echo=FALSE, message=FALSE}
-births = read_csv("2022birthdataWiscIteration2.csv")
+births = read_csv("https://uwmadison.box.com/shared/static/xgwpsw0nx2gniuof4okacl9d8huu4v3v.csv")
 ```
 
 <center> <h1>Top 10 WI Counties by Total Births</h1> </center>
@@ -34,8 +34,7 @@ top_births = births %>%
   )%>%
   slice_head(n = 10)
 
-# head(top_births, 10)
-
+# format as a kableExtra table, just keep top 10
 top_births %>%
   kbl() %>%
   kable_paper("hover", full_width = F)
@@ -57,8 +56,7 @@ top_fertility = births %>%
   )%>%
   slice_head(n = 10)
 
-# head(top_fertility, 10)
-
+# format as a kableExtra table, just keep top 10
 top_fertility %>%
   kbl() %>%
   kable_paper("hover", full_width = F)
