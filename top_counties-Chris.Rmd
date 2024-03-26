@@ -18,7 +18,7 @@ library(kableExtra)
 births = read_csv("2022birthdataWiscIteration2.csv")
 ```
 
-### Top 10 Counties by Total Births 
+<center> <h1>Top 10 WI Counties by Total Births</h1> </center>
 
 ```{r}
 # table for top 10 highest total birth counties
@@ -41,7 +41,8 @@ top_births %>%
   kable_paper("hover", full_width = F)
 ```
 
-### Top 10 Counties by Fertility Rate
+<center> <h1>Top 10 WI Counties by Fertility Rate</h1> </center>
+
 ```{r}
 # table for top 10 highest fertility rate counties
 top_fertility = births %>%
