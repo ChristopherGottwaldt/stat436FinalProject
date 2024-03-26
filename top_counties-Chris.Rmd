@@ -1,32 +1,29 @@
 ---
-title: "Top Counties"
+title: "Tables of Birth Statistics for WI Counties"
 author: "Chris Gottwaldt"
 date: "`r Sys.Date()`"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 
-library(readxl)
-library(ggplot2)
-library(shiny)
+library(tidyverse)
 library(dplyr)
-library(readr)
 library(knitr)
-library(tidyr)
+library(kableExtra)
 ```
 
-```{r}
+```{r, echo=FALSE, message=FALSE}
 births = read_csv("2022birthdataWiscIteration2.csv")
-
-# head(births)
-# colnames(births)
 ```
 
+### Top 10 Counties by Total Births 
+
 ```{r}
-# table for top 5 highest total birth counties
+# table for top 10 highest total birth counties
 top_births = births %>%
+  filter(county != "Total") %>%
   arrange(desc(total_births)) %>%
   reframe(
     "County" = county,
@@ -34,14 +31,21 @@ top_births = births %>%
     "Female Babies" = f_births,
     "Male Babies" = m_births,
     "Crude Birth Rate" = crude_birth_rate
-  )
+  )%>%
+  slice_head(n = 10)
 
-head(top_births, 10)
+# head(top_births, 10)
+
+top_births %>%
+  kbl() %>%
+  kable_paper("hover", full_width = F)
 ```
 
+### Top 10 Counties by Fertility Rate
 ```{r}
-# table for top 5 highest fertility rate counties
+# table for top 10 highest fertility rate counties
 top_fertility = births %>%
+  filter(county != "Total") %>%
   arrange(desc(fertility_rate)) %>%
   reframe(
     "County" = county,
@@ -49,9 +53,14 @@ top_fertility = births %>%
     "Total Births" = total_births,
     "Female Babies" = f_births,
     "Male Babies" = m_births
-  )
+  )%>%
+  slice_head(n = 10)
 
-head(top_fertility, 10)
+# head(top_fertility, 10)
+
+top_fertility %>%
+  kbl() %>%
+  kable_paper("hover", full_width = F)
 ```
 
 
